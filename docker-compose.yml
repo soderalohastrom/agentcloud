@@ -4,7 +4,6 @@ services:
   docker_mongo:
     restart: always
     image: mongo:latest
-    ports:
       - "127.0.0.1:27017:27017"
 
   docker_redis:
@@ -70,6 +69,7 @@ services:
       - DB_URL=mongodb://docker_mongo:27017/test
       - REDIS_HOST=docker_redis
       - MONGO_DB_NAME=test
+      - OPENAI_API_KEY=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
       - MAX_RETRIES=10
       - AGENT_BACKEND_SOCKET_TOKEN=changeme
 
