@@ -25,6 +25,7 @@ import * as credentialController from './controllers/credential';
 import * as stripeController from './controllers/stripe';
 import * as toolController from './controllers/tool';
 import * as datasourceController from './controllers/datasource';
+import * as airbyteProxyController from './controllers/airbyte';
 
 export default function router(server, app) {
 
@@ -36,9 +37,9 @@ export default function router(server, app) {
 	const oauthRouter = Router({ mergeParams: true, caseSensitive: true });
 	oauthRouter.get('/redirect', useSession, useJWT, fetchSession, renderStaticPage(app, '/redirect'));
 	oauthRouter.get('/github', useSession, useJWT, myPassport.authenticate('github'));
-	oauthRouter.get('/github/callback', useSession, useJWT, myPassport.authenticate('github', { failureRedirect: '/login' }), fetchSession, (_req, res) => { res.redirect('/account'); });
+	oauthRouter.get('/github/callback', useSession, useJWT, myPassport.authenticate('github', { failureRedirect: '/login' }), fetchSession, (_req, res) => { res.redirect(`/auth/redirect?to=${encodeURIComponent('/account')}`); });
 	oauthRouter.get('/google', useSession, useJWT, myPassport.authenticate('google', { scope: ['profile', 'email'] }));
-	oauthRouter.get('/google/callback', useSession, useJWT, myPassport.authenticate('google', { failureRedirect: '/login' }), fetchSession, (_req, res) => { res.redirect('/account'); });
+	oauthRouter.get('/google/callback', useSession, useJWT, myPassport.authenticate('google', { failureRedirect: '/login' }), fetchSession, (_req, res) => { res.redirect(`/auth/redirect?to=${encodeURIComponent('/account')}`); });
 	server.use('/auth', useSession, myPassport.session(), oauthRouter);
 
 	// Body and query parsing middleware
@@ -69,6 +70,7 @@ export default function router(server, app) {
 
 	// Team endpoints
 	const teamRouter = Router({ mergeParams: true, caseSensitive: true });
+	teamRouter.get('/airbyte/specification', airbyteProxyController.specificationJson);
 	teamRouter.get('/sessions', sessionController.sessionsPage.bind(null, app));
 	teamRouter.get('/session/:sessionId([a-f0-9]{24})/messages.json', sessionController.sessionMessagesJson);
 	teamRouter.get('/session/:sessionId([a-f0-9]{24}).json', sessionController.sessionJson);

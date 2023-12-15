@@ -22,6 +22,15 @@ export default function Datasources(props) {
 		await API.getDatasources({ resourceSlug }, dispatch, setError, router);
 	}
 
+	//TODO: move to add page
+	const [connectorList, setConnectorList] = useState([]);
+	useEffect(() => {
+		fetch('https://connectors.airbyte.com/files/generated_reports/connector_registry_report.json')
+			.then(res => res.json())
+			.then(json => setConnectorList(json));
+	}, []);
+	console.log('connectorList', connectorList);
+
 	useEffect(() => {
 		fetchDatasources();
 	}, [resourceSlug]);
